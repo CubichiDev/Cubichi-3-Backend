@@ -98,8 +98,6 @@ public class AuthService : IAuthService
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: Environment.GetEnvironmentVariable("JWT_ISSUER") ?? throw new Exception("JWT issuer not found"),
-            audience: Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? throw new Exception("JWT audience not found"),
             claims: claims,
             expires: DateTime.Now.AddDays(7),
             signingCredentials: creds
