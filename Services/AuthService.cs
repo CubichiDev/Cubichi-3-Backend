@@ -22,9 +22,10 @@ public class AuthService : IAuthService
     {
         // Get the user from the database by username and verify the password
         var user = await _dataBaseInteractor.GetUserAsync(request.UserName);
-        if (user == null || !VerifyPasswordHash(request.Password, Encoding.UTF8.GetBytes(user.PasswordHash), Encoding.UTF8.GetBytes(user.PasswordSalt)))
+
+        if (user == null || !VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
         {
-            throw new Exception("Invalid username or password");
+            throw new InvalidOperationException("No user with this username or password");
         }
 
         // Generate a JWT token
@@ -79,11 +80,25 @@ public class AuthService : IAuthService
         passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
     }
 
-    private static bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+    public bool VerifyPasswordHash(string password, string storedHashBase64, string storedSaltBase64)
     {
-        using var hmac = new HMACSHA512(passwordSalt);
-        var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-        return computedHash.SequenceEqual(passwordHash);
+        if (password == null) throw new ArgumentNullException(nameof(password));
+        if (string.IsNullOrWhiteSpace(storedHashBase64)) throw new ArgumentException("Invalid stored hash.", nameof(storedHashBase64));
+        if (string.IsNullOrWhiteSpace(storedSaltBase64)) throw new ArgumentException("Invalid stored salt.", nameof(storedSaltBase64));
+
+        var storedHash = Convert.FromBase64String(storedHashBase64);
+        var storedSalt = Convert.FromBase64String(storedSaltBase64);
+
+        using (var hmac = new HMACSHA512(storedSalt))
+        {
+            var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            for (int i = 0; i < computedHash.Length; i++)
+            {
+                if (computedHash[i] != storedHash[i]) return false;
+            }
+        }
+
+        return true;
     }
 
     private static object GenerateJwtToken(User user)
