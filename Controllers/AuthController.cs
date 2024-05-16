@@ -18,14 +18,28 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<AuthResponse>> RegisterAsync([FromBody] RegisterRequest request)
     {
-        var response = await _authService.RegisterAsync(request);
-        return Ok(response);
+        try
+        {
+            var response = await _authService.RegisterAsync(request);
+            return Ok(response);
+        }
+        catch (Exception)
+        {
+            return BadRequest("User with this username or email already exists");
+        }
     }
 
     [HttpPost("login")]
     public async Task<ActionResult<AuthResponse>> LoginAsync([FromBody] LoginRequest request)
     {
-        var response = await _authService.LoginAsync(request);
-        return Ok(response);
+        try
+        {
+            var response = await _authService.LoginAsync(request);
+            return Ok(response);
+        }
+        catch (Exception)
+        {
+            return BadRequest("No user with this username or password");
+        }
     }
 }
