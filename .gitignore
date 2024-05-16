@@ -1,0 +1,75 @@
+# .NET Core / ASP.NET
+## Build artifacts
+bin/
+obj/
+
+## .NET Core / ASP.NET specific
+*.swp
+*.suo
+*.user
+*.vscode
+.vs/
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+
+## Visual Studio / Visual Studio Code
+.vscode/
+*.sln
+*.suo
+*.user
+*.csproj
+*.xproj
+*.swp
+*.userprefs
+*.bak
+*.cache
+*.vspscc
+*.vssscc
+*_i.c
+*_p.c
+*.ilk
+*.meta
+*.obj
+*.pch
+*.pdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+## NuGet
+packages/
+*.nupkg
+*.pdb
+*.dll
+*.cache
+*.exe
+*.log
+*.vsix
+.project.json
+.project.lock.json
+.shproj
+.lock.json
+.nuget/
+**/project.lock.json
