@@ -26,7 +26,6 @@ bld/
 *.sln
 *.suo
 *.user
-*.csproj
 *.xproj
 *.swp
 *.userprefs
