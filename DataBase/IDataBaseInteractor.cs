@@ -6,7 +6,7 @@ public interface IDataBaseInteractor
 {
     Task<User?> GetUserAsync(string userName);
     Task<User?> GetUserAsync(int userId);
-    Task<User?> GetUserAsync(string userName, string PasswordHash, string PasswordSalt);
+    Task<User?> GetUserAsync(string userName, string Password);
     Task<User> CreateUserAsync(User user);
     Task<User> UpdateUserAsync(User user);
     Task<User> DeleteUserAsync(User user);

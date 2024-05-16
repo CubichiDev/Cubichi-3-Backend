@@ -18,11 +18,10 @@ public class PsqlInteractor : IDataBaseInteractor
     public async Task<User> CreateUserAsync(User user)
     {
         // Create a command to insert a new user
-        using var command = new NpgsqlCommand("INSERT INTO users (username, email, password_hash, password_salt) VALUES (@username, @email, @password_hash, @password_salt) RETURNING id", _connection);
+        using var command = new NpgsqlCommand("INSERT INTO users (username, email, password) VALUES (@username, @email, encode(digest('{user.Password}', 'sha256'), 'hex')) RETURNING id", _connection);
         command.Parameters.AddWithValue("username", user.UserName);
         command.Parameters.AddWithValue("email", user.Email);
-        command.Parameters.AddWithValue("password_hash", user.PasswordHash);
-        command.Parameters.AddWithValue("password_salt", user.PasswordSalt);
+        command.Parameters.AddWithValue("password", user.Password);
 
         // Execute the command and get the new user's id
         user.Id = (int)(await command.ExecuteScalarAsync() ?? throw new Exception("Failed to create user"));
@@ -52,8 +51,7 @@ public class PsqlInteractor : IDataBaseInteractor
                 Id = reader.GetInt32(0),
                 UserName = reader.GetString(1),
                 Email = reader.GetString(2),
-                PasswordHash = reader.GetString(3),
-                PasswordSalt = reader.GetString(4)
+                Password = reader.GetString(3)
             };
         }
 
@@ -73,20 +71,18 @@ public class PsqlInteractor : IDataBaseInteractor
                 Id = reader.GetInt32(0),
                 UserName = reader.GetString(1),
                 Email = reader.GetString(2),
-                PasswordHash = reader.GetString(3),
-                PasswordSalt = reader.GetString(4)
+                Password = reader.GetString(3)
             };
         }
 
         return null;
     }
 
-    public async Task<User?> GetUserAsync(string userName, string passwordHash, string passwordSalt)
+    public async Task<User?> GetUserAsync(string userName, string password)
     {
-        using var command = new NpgsqlCommand("SELECT * FROM users WHERE username = @username AND password_hash = @password_hash AND password_salt = @password_salt", _connection);
+        using var command = new NpgsqlCommand("SELECT * FROM users WHERE username = @username AND password = encode(digest('{password}', 'sha256'), 'hex')", _connection);
         command.Parameters.AddWithValue("username", userName);
-        command.Parameters.AddWithValue("password_hash", passwordHash);
-        command.Parameters.AddWithValue("password_salt", passwordSalt);
+        command.Parameters.AddWithValue("password", password);
 
         await using var reader = await command.ExecuteReaderAsync();
         if (await reader.ReadAsync())
@@ -96,8 +92,7 @@ public class PsqlInteractor : IDataBaseInteractor
                 Id = reader.GetInt32(0),
                 UserName = reader.GetString(1),
                 Email = reader.GetString(2),
-                PasswordHash = reader.GetString(3),
-                PasswordSalt = reader.GetString(4)
+                Password = reader.GetString(3)
             };
         }
 
@@ -106,12 +101,11 @@ public class PsqlInteractor : IDataBaseInteractor
 
     public async Task<User> UpdateUserAsync(User user)
     {
-        using var command = new NpgsqlCommand("UPDATE users SET username = @username, email = @email, password_hash = @password_hash, password_salt = @password_salt WHERE id = @id", _connection);
+        using var command = new NpgsqlCommand("UPDATE users SET username = @username, email = @email, password = @password WHERE id = @id", _connection);
         command.Parameters.AddWithValue("id", user.Id);
         command.Parameters.AddWithValue("username", user.UserName);
         command.Parameters.AddWithValue("email", user.Email);
-        command.Parameters.AddWithValue("password_hash", user.PasswordHash);
-        command.Parameters.AddWithValue("password_salt", user.PasswordSalt);
+        command.Parameters.AddWithValue("password", user.Password);
 
         await command.ExecuteNonQueryAsync();
         return user;

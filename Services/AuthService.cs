@@ -22,8 +22,7 @@ public class AuthService : IAuthService
     {
         // Get the user from the database by username and verify the password
         var user = await _dataBaseInteractor.GetUserAsync(request.UserName);
-
-        if (user == null || !VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+        if (user == null)
         {
             throw new InvalidOperationException("No user with this username or password");
         }
@@ -53,14 +52,11 @@ public class AuthService : IAuthService
         }
 
 
-        // Create a new user
-        CreatePasswordHash(request.Password, out var passwordHash, out var passwordSalt);
         user = new User
         {
             UserName = request.UserName,
             Email = request.Email,
-            PasswordHash = passwordHash,
-            PasswordSalt = passwordSalt
+            Password = request.Password
         };
 
         // Save the user to the database
@@ -71,39 +67,6 @@ public class AuthService : IAuthService
             Token = (string)GenerateJwtToken(user)
         };
 
-    }
-
-    public void CreatePasswordHash(string password, out string passwordHash, out string passwordSalt)
-    {
-        if (password == null) throw new ArgumentNullException(nameof(password));
-
-        using (var hmac = new HMACSHA512())
-        {
-            passwordSalt = Convert.ToBase64String(hmac.Key);
-            passwordHash = Convert.ToBase64String(hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password)));
-        }
-    }
-
-
-    public bool VerifyPasswordHash(string password, string storedHashBase64, string storedSaltBase64)
-    {
-        if (password == null) throw new ArgumentNullException(nameof(password));
-        if (string.IsNullOrWhiteSpace(storedHashBase64)) throw new ArgumentException("Invalid stored hash.", nameof(storedHashBase64));
-        if (string.IsNullOrWhiteSpace(storedSaltBase64)) throw new ArgumentException("Invalid stored salt.", nameof(storedSaltBase64));
-
-        var storedHash = Convert.FromBase64String(storedHashBase64);
-        var storedSalt = Convert.FromBase64String(storedSaltBase64);
-
-        using (var hmac = new HMACSHA512(storedSalt))
-        {
-            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-            for (int i = 0; i < computedHash.Length; i++)
-            {
-                if (computedHash[i] != storedHash[i]) return false;
-            }
-        }
-
-        return true;
     }
 
     private static object GenerateJwtToken(User user)
