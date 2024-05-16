@@ -59,8 +59,8 @@ public class AuthService : IAuthService
         {
             UserName = request.UserName,
             Email = request.Email,
-            PasswordHash = Encoding.UTF8.GetString(passwordHash),
-            PasswordSalt = Encoding.UTF8.GetString(passwordSalt)
+            PasswordHash = passwordHash,
+            PasswordSalt = passwordSalt
         };
 
         // Save the user to the database
@@ -73,12 +73,17 @@ public class AuthService : IAuthService
 
     }
 
-    private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+    public void CreatePasswordHash(string password, out string passwordHash, out string passwordSalt)
     {
-        using var hmac = new HMACSHA512();
-        passwordSalt = hmac.Key;
-        passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+        if (password == null) throw new ArgumentNullException(nameof(password));
+
+        using (var hmac = new HMACSHA512())
+        {
+            passwordSalt = Convert.ToBase64String(hmac.Key);
+            passwordHash = Convert.ToBase64String(hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password)));
+        }
     }
+
 
     public bool VerifyPasswordHash(string password, string storedHashBase64, string storedSaltBase64)
     {
