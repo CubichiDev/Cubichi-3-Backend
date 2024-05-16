@@ -42,13 +42,13 @@ public class AuthService : IAuthService
         var user = await _dataBaseInteractor.GetUserAsync(request.UserName);
         if (user != null)
         {
-            throw new Exception("User with this username already exists");
+            throw new InvalidOperationException("User with this username already exists");
         }
 
         user = await _dataBaseInteractor.GetUserAsync(request.Email);
         if (user != null)
         {
-            throw new Exception("User with this email already exists");
+            throw new InvalidOperationException("User with this email already exists");
         }
 
 

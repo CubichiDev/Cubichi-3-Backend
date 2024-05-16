@@ -23,9 +23,13 @@ public class AuthController : ControllerBase
             var response = await _authService.RegisterAsync(request);
             return Ok(response);
         }
-        catch (Exception)
+        catch (InvalidOperationException)
         {
             return BadRequest("User with this username or email already exists");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
         }
     }
 
