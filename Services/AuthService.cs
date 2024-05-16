@@ -91,7 +91,7 @@ public class AuthService : IAuthService
 
         using (var hmac = new HMACSHA512(storedSalt))
         {
-            var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             for (int i = 0; i < computedHash.Length; i++)
             {
                 if (computedHash[i] != storedHash[i]) return false;

@@ -41,9 +41,13 @@ public class AuthController : ControllerBase
             var response = await _authService.LoginAsync(request);
             return Ok(response);
         }
-        catch (Exception)
+        catch (InvalidOperationException)
         {
             return BadRequest("No user with this username or password");
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
         }
     }
 }
