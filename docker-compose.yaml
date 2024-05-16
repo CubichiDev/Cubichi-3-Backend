@@ -9,8 +9,6 @@ services:
     ports:
       - 8080:8080
       - 5432:5432
-    networks:
-      - mynet
     environment:
       JWT_SECRET: ${JWT_SECRET}
       POSTGRESQL_CONNECTION_STRING: ${POSTGRESQL_CONNECTION_STRING}
