@@ -73,3 +73,5 @@ packages/
 .lock.json
 .nuget/
 **/project.lock.json
+
+.env
