@@ -14,14 +14,13 @@ public class SkinController : ControllerBase
         _skinService = skinService;
     }
 
-    [HttpPost("upload"), Authorize]
-    public async Task<ActionResult> UploadSkinAsync([FromForm] IFormFile file)
+    [HttpGet("{userName}")]
+    public async Task<ActionResult> GetSkinAsync(string userName)
     {
         try
         {
-            var userName = GetUserNameFromToken(Request.Headers.Authorization!);
-            await _skinService.UploadSkinAsync(userName, file);
-            return Ok();
+            var skin = await _skinService.GetSkinAsync(userName);
+            return File(skin, "image/png");
         }
         catch (Exception e)
         {
@@ -29,10 +28,18 @@ public class SkinController : ControllerBase
         }
     }
 
-    private static string GetUserNameFromToken(string token)
+    [HttpPost("upload"), Authorize]
+    public async Task<ActionResult> UploadSkinAsync([FromForm] IFormFile file)
     {
-        var handler = new JwtSecurityTokenHandler();
-        var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
-        return jsonToken?.Claims.First(claim => claim.Type == "name").Value ?? throw new InvalidOperationException("Invalid token");
+        try
+        {
+            string userName = User?.Identity?.Name!;
+            await _skinService.UploadSkinAsync(userName, file);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, e.Message);
+        }
     }
 }

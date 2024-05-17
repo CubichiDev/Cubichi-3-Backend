@@ -7,6 +7,19 @@ public class SkinService : ISkinService
         // Create directories if they don't exist
         Directory.CreateDirectory(Path.Combine("files", "skins"));
     }
+
+    public async Task<byte[]> GetSkinAsync(string userName)
+    {
+        try
+        {
+            return await File.ReadAllBytesAsync(Path.Combine("files", "skins", userName + ".png"));
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Failed to get skin", e);
+        }
+    }
+
     public async Task UploadSkinAsync(string userName, IFormFile file)
     {
         try
