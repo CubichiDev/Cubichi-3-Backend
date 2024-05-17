@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
+
 [ApiController]
 [Route("api/skin")]
 public class IAuthService : ControllerBase
