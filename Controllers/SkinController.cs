@@ -1,15 +1,25 @@
+using System.IdentityModel.Tokens.Jwt;
+using Cubichi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/skin")]
-public class IAuthService : ControllerBase
+public class SkinController : ControllerBase
 {
+    private readonly ISkinService _skinService;
+
+    public SkinController(ISkinService skinService)
+    {
+        _skinService = skinService;
+    }
+
     [HttpPost("upload"), Authorize]
     public async Task<ActionResult> UploadSkinAsync([FromForm] IFormFile file)
     {
         try
         {
-            var userName = GetUserNameFromToken(Request.Headers["Authorization"]);
+            var userName = GetUserNameFromToken(Request.Headers.Authorization!);
             await _skinService.UploadSkinAsync(userName, file);
             return Ok();
         }
@@ -23,6 +33,6 @@ public class IAuthService : ControllerBase
     {
         var handler = new JwtSecurityTokenHandler();
         var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
-        return jsonToken?.Claims.First(claim => claim.Type == "name").Value;
+        return jsonToken?.Claims.First(claim => claim.Type == "name").Value ?? throw new InvalidOperationException("Invalid token");
     }
 }

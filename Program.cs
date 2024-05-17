@@ -18,6 +18,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IDataBaseInteractor, PsqlInteractor>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ISkinService, SkinService>();
 
 // Add JWT authentication
 builder.Services.AddAuthentication().AddJwtBearer(

@@ -7,7 +7,7 @@ public class SkinService : ISkinService
         // Create directories if they don't exist
         Directory.CreateDirectory(Path.Combine("files", "skins"));
     }
-    public async Task UploadSkinAsync(string userName, IFileForm file)
+    public async Task UploadSkinAsync(string userName, IFormFile file)
     {
         try
         {
