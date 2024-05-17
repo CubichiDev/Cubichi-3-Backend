@@ -2,6 +2,11 @@ namespace Cubichi.Services;
 
 public class SkinService : ISkinService
 {
+    public SkinService()
+    {
+        // Create directories if they don't exist
+        Directory.CreateDirectory(Path.Combine("files", "skins"));
+    }
     public async Task UploadSkinAsync(string userName, IFileForm file)
     {
         try
