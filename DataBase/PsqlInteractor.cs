@@ -18,7 +18,7 @@ public class PsqlInteractor : IDataBaseInteractor
     public async Task<User> CreateUserAsync(User user)
     {
         // Create a command to insert a new user
-        using var command = new NpgsqlCommand("INSERT INTO users (username, email, password) VALUES (@username, @email, encode(digest('{user.Password}', 'sha256'), 'hex')) RETURNING id", _connection);
+        using var command = new NpgsqlCommand("INSERT INTO users (username, email, password) VALUES (@username, @email, encode(digest(@password, 'sha256'), 'hex')) RETURNING id", _connection);
         command.Parameters.AddWithValue("username", user.UserName);
         command.Parameters.AddWithValue("email", user.Email);
         command.Parameters.AddWithValue("password", user.Password);
@@ -80,7 +80,7 @@ public class PsqlInteractor : IDataBaseInteractor
 
     public async Task<User?> GetUserAsync(string userName, string password)
     {
-        using var command = new NpgsqlCommand("SELECT * FROM users WHERE username = @username AND password = encode(digest('{password}', 'sha256'), 'hex')", _connection);
+        using var command = new NpgsqlCommand("SELECT * FROM users WHERE username = @username AND password = encode(digest(@password, 'sha256'), 'hex')", _connection);
         command.Parameters.AddWithValue("username", userName);
         command.Parameters.AddWithValue("password", password);
 

@@ -8,7 +8,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8083:8080
-      - 5434:5432
     environment:
       JWT_SECRET: ${JWT_SECRET}
       POSTGRESQL_CONNECTION_STRING: ${POSTGRESQL_CONNECTION_STRING}
