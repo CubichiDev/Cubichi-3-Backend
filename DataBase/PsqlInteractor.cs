@@ -9,8 +9,13 @@ public class PsqlInteractor : IDataBaseInteractor
 
     public PsqlInteractor()
     {
-        // Read connection string from .env file
-        string? connectionString = Environment.GetEnvironmentVariable("POSTGRESQL_CONNECTION_STRING") ?? throw new Exception("Connection string not found");
+        var host = Environment.GetEnvironmentVariable("DB_HOST") ?? throw new Exception("DB_HOST not found");
+        var port = Environment.GetEnvironmentVariable("DB_PORT") ?? throw new Exception("DB_PORT not found");
+        var dbName = Environment.GetEnvironmentVariable("DB_NAME") ?? throw new Exception("DB_NAME not found");
+        var user = Environment.GetEnvironmentVariable("DB_USER") ?? throw new Exception("DB_USER not found");
+        var password = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? throw new Exception("DB_PASSWORD not found");
+
+        var connectionString = $"Host={host};Port={port};Database={dbName};Username={user};Password={password}";
         _connection = new NpgsqlConnection(connectionString);
         _connection.Open();
     }

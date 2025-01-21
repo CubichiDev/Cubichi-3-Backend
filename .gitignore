@@ -74,3 +74,5 @@ packages/
 **/project.lock.json
 
 .env
+
+out/
